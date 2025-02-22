@@ -29,6 +29,8 @@ App Komponenti:
 App komponentində useEffect və useState hook-larından istifadə edərək Rick and Morty API-dən məlumatları əldə edin.
 Yükləmə zamanı Spinner komponenti, xəta baş verərsə isə Toast və ya səhv mesajı göstərin.
 Dizayn Referans Saytı:
+-------------------SAYT-------------------
+https://rm-ready.netlify.app
 
 
 Data Çəkilməsi: useEffect ilə Rick and Morty API-dən xarakter məlumatlarını alın və useState ilə saxlayın.
