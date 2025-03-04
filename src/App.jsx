@@ -1,26 +1,38 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { Flex, Box } from "@chakra-ui/react";
-
-import { Header } from "./components/Header";
-import { Footer } from "./components/Footer";
-import { DogGallery } from "./pages/DogGallery";
-import { CatGallery } from "./pages/CatGallery";
+import { useState } from 'react';
 
 function App() {
+  const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState("");
+
+  // Yeni tapşırıq əlavə edən funksiya
+  const addTodo = (e) => {
+    e.preventDefault();
+    if (!input.trim()) return; // Boş dəyəri əlavə etmə
+    setTodos([...todos, input]);
+    setInput("");
+  };
+
   return (
-    <Router>
-      <Flex direction="column" minHeight="100vh">
-        <Header />
-        <Box flex="1">
-          <Routes>
-            <Route path="/dogs" element={<DogGallery />} />
-            <Route path="/cats" element={<CatGallery />} />
-            <Route path="*" element={<Navigate to="/dogs" />} />
-          </Routes>
-        </Box>
-        <Footer />
-      </Flex>
-    </Router>
+    <div style={{ padding: '20px' }}>
+      <h1>TODO App</h1>
+      <form onSubmit={addTodo}>
+        <input 
+          type="text" 
+          value={input} 
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Yeni tapşırıq əlavə edin"
+          style={{border: '1px solid black'}}
+        />
+        <button type="submit">Əlavə et</button>
+      </form>
+      <ul>
+        {todos.map((todo, index) => (
+          <li key={index}>
+            {todo} 
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
