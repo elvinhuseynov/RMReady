@@ -1,39 +1,90 @@
-import { useState } from 'react';
+// src/App.tsx
+import { useState, useEffect } from 'react';
+import './App.css';
 
-function App() {
-  const [todos, setTodos] = useState([]);
-  const [input, setInput] = useState("");
+const GRID_SIZE = 3;            // 3×3 grid
+const TOTAL_TIME = 30;          // game length in seconds
+const MOLE_INTERVAL = 800;      // how often a new “mole” appears (ms)
 
-  // Yeni tapşırıq əlavə edən funksiya
-  const addTodo = (e) => {
-    e.preventDefault();
-    if (!input.trim()) return; // Boş dəyəri əlavə etmə
-    setTodos([...todos, input]);
-    setInput("");
+export const App = () => {
+  const [activeIndex, setActiveIndex] = useState(null);
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // Game loop: spawn “mole” and count down timer
+  useEffect(() => {
+    let moleTimer
+    let countdown
+
+    if (isPlaying) {
+      moleTimer = setInterval(() => {
+        setActiveIndex(Math.floor(Math.random() * GRID_SIZE * GRID_SIZE));
+      }, MOLE_INTERVAL);
+
+      countdown = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(moleTimer);
+            clearInterval(countdown);
+            setIsPlaying(false);
+            setActiveIndex(null);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(moleTimer);
+      clearInterval(countdown);
+    };
+  }, [isPlaying]);
+
+  const handleBoxClick = (idx) => {
+    if (!isPlaying) return;
+    if (idx === activeIndex) {
+      setScore(s => s + 1);
+      setActiveIndex(null);
+    }
+  };
+
+  const startGame = () => {
+    setScore(0);
+    setTimeLeft(TOTAL_TIME);
+    setIsPlaying(true);
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>TODO App</h1>
-      <form onSubmit={addTodo}>
-        <input 
-          type="text" 
-          value={input} 
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Yeni tapşırıq əlavə edin"
-          style={{border: '1px solid black'}}
-        />
-        <button type="submit">Əlavə et</button>
-      </form>
-      <ul>
-        {todos.map((todo, index) => (
-          <li key={index}>
-            {todo} 
-          </li>
-        ))}
-      </ul>
+    <div className="App">
+      {!isPlaying ? (
+    <>
+        <button className="start-btn" onClick={startGame}>
+          Start Game
+        </button>
+        <span>Score: {score}</span>
+        </>
+      ) : (
+        <>
+          <div className="info">
+            <span>Time: {timeLeft}s</span>
+            <span>Score: {score}</span>
+          </div>
+
+          <div className="grid">
+            {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => (
+              <div
+                key={i}
+                className={`box ${i === activeIndex ? 'active' : ''}`}
+                onClick={() => handleBoxClick(i)}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
-}
+};
 
 export default App;
